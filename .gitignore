@@ -1,0 +1,7 @@
+.env
+decompiled
+backup
+*.apk
+*.idsig
+*.jks
+*.jar
