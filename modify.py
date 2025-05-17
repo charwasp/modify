@@ -122,13 +122,13 @@ elif shutil.which('apktool'):
 else:
 	APKTOOL_COMMAND = f'{JAVA_COMMAND} -jar {download_latest("iBotPeaches/Apktool", ".jar")}'
 
-if os.getenv('SIGN_COMMAND', ''):
-	SIGN_COMMAND = os.getenv('SIGN_COMMAND')
+if os.getenv('SIGNING_COMMAND', ''):
+	SIGNING_COMMAND = os.getenv('SIGNING_COMMAND')
 else:
 	if not Path('keystore.jks').exists():
 		logging.info('Generating keystore.jks...')
 		command(f'keytool -genkey -v -keystore keystore.jks -alias charwasp -keyalg RSA -keysize 2048 -validity 10000 -storepass 000000 -keypass 000000 -dname "CN=unknown, OU=unknown, O=unknown, L=unknown, ST=unknown, C=unknown"')
-	SIGN_COMMAND = 'apksigner sign --verbose --ks keystore.jks --ks-key-alias charwasp --ks-pass pass:000000 --key-pass pass:000000'
+	SIGNING_COMMAND = 'apksigner sign --verbose --ks keystore.jks --ks-key-alias charwasp --ks-pass pass:000000 --key-pass pass:000000'
 
 # Merge APKs
 if Path('merged.apk').exists():
@@ -194,4 +194,4 @@ else:
 
 # Build APK
 command(f'{APKTOOL_COMMAND} build decompiled -o modified.apk')
-command(f'{SIGN_COMMAND} modified.apk')
+command(f'{SIGNING_COMMAND} modified.apk')
