@@ -54,7 +54,20 @@ def make_backup(path):
 	if bak_path.exists():
 		return
 	bak_path.parent.mkdir(parents=True, exist_ok=True)
-	shutil.copy2('decompiled/' + path, bak_path)
+	original_path = Path('decompiled/' + path)
+	if original_path.is_dir():
+		shutil.copytree(original_path, bak_path)
+	else:
+		shutil.copy2(original_path, bak_path)
+
+def delete_path(path):
+	path = 'decompiled/' + path
+	shutil.rmtree(path)
+	while True:
+		path = os.path.dirname(path)
+		if os.listdir(path):
+			break
+		shutil.rmtree(path)
 
 def replace_in_file(path, replacements):
 	bak_path = Path('backup/' + path)
@@ -88,6 +101,16 @@ def replace_in_file_bin(path, replacements):
 			shutil.copy2(path, bak_path)
 		with open(path, 'wb') as f:
 			f.write(replaced)
+
+def delete_lines_in_file(path, patterns):
+	src_path = Path('decompiled/' + path)
+	lines = src_path.read_text().splitlines()
+	new_lines = []
+	for line in lines:
+		if not any(pattern in line for pattern in patterns):
+			new_lines.append(line)
+	with open(src_path, 'w') as f:
+		f.write('\n'.join(new_lines) + '\n')
 
 def png_size(path):
 	with open(path, 'rb') as f:
@@ -176,6 +199,14 @@ package_name = XMLTree.parse('backup/AndroidManifest.xml').getroot().attrib['pac
 new_package_name = package_name + '.charwasp'
 replace_in_file('AndroidManifest.xml', [[package_name, new_package_name]])
 replace_in_file('apktool.yml', [[re.compile(r'(renameManifestPackage: )null'), r'\1' + new_package_name]])
+
+# Remove pairip; otherwise cannot launch without Play Services
+logging.info('Removing pairip...')
+delete_lines_in_file('AndroidManifest.xml', ['com.pairip.licensecheck', 'com.android.vending.CHECK_LICENSE'])
+for path in glob.iglob('smali*/com/pairip/licensecheck', recursive=True, root_dir='decompiled'):
+	logging.info(f'Removing {path}...')
+	make_backup(path)
+	delete_path(path)
 
 # Change app icon and title screen
 if IMAGEMAGICK_COMMAND:
