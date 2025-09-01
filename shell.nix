@@ -11,7 +11,7 @@
 		python3
 	];
 	shellHook = let
-		buildToolsVersion = "34.0.0";
+		buildToolsVersion = "36.0.0";
 		androidComposition = androidenv.composeAndroidPackages {
 			buildToolsVersions = [ buildToolsVersion ];
 		};

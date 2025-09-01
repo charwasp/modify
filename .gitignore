@@ -1,5 +1,6 @@
 .env
-decompiled
+apk*/
+decompiled*/
 backup
 *.apk
 *.idsig
