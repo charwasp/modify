@@ -197,7 +197,10 @@ logging.info('Changing package name...')
 make_backup('AndroidManifest.xml')
 package_name = XMLTree.parse('backup/AndroidManifest.xml').getroot().attrib['package']
 new_package_name = package_name + '.charwasp'
-replace_in_file('AndroidManifest.xml', [[package_name, new_package_name]])
+replace_in_file('AndroidManifest.xml', [
+	[package_name, new_package_name],
+	[' android:name="com.pairip.application.Application"', '']
+])
 replace_in_file('apktool.yml', [[re.compile(r'(renameManifestPackage: )null'), r'\1' + new_package_name]])
 
 # Remove pairip; otherwise cannot launch without Play Services
